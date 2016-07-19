@@ -1,8 +1,2 @@
-ifcconfig wlan0
-iwconfig wlan0 essid "The Link" thelinkseoul
+cd /home/pi/kobo_stable/ && git pull && python3 cap_and_send.py
 
-cd /
-cd /home/pi/Kobo/kobo_dev/
-
-git pull
-python3 cap_and_send.py 
