@@ -96,6 +96,9 @@ class Processor(object):
         while True:
             time.sleep(60)
             r = requests.get(REM_ENDPOINT)
-            print(r.content)
+            if len(r.content) > 0:
+                vlc_playback(r.content)
+            else:
+                return
 
             

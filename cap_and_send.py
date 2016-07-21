@@ -53,7 +53,7 @@ reminder_thread.start()
 pro.vlc_playback("Hello, I am Kobo, your home assistant.  The date is %s.  Say something when you are ready to begin." % t[1])
 
 with sr.Microphone(sample_rate = 48000, device_index = 2, chunk_size = 5120) as source:
-    r.adjust_for_ambient_noise(source, duration = 1)
+#    r.adjust_for_ambient_noise(source, duration = 1)
     while True:    
  #       PB = True
         print("Say Something...")
@@ -71,8 +71,9 @@ with sr.Microphone(sample_rate = 48000, device_index = 2, chunk_size = 5120) as 
             send_txt = r.recognize_google(audio,language = LANGUAGE, key = GOOGLE_SPEECH_KEY)
             pro.sys_process(send_txt)
 
-            #send_txt = r.recognize_sphinx(audio)
-            
+            #send_txt2 = r.recognize_sphinx(audio)
+            #print("WHAAAAA ::: %s",send_txt2)            
+
             print("got back from google")
             print(send_txt.encode('utf-8')) 
             print("getting response")
