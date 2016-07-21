@@ -113,6 +113,18 @@ def task_thread(timing = 30):
         if len(response.content) > 0: vlc_playback(str(response.content))
 
 
+def sys_process(response_string):
+    print("Checking for processes")
+    processes = {
+                  "blue red blue blue": os._exit(0)
+
+     }    
+    try:
+        processes[response_string]()
+ 
+
+    except:
+        pass
 
 ##############################################################################
 ##############################################################################
@@ -142,6 +154,7 @@ with sr.Microphone(sample_rate = 48000, device_index = 2, chunk_size = 5120) as 
         try:
             print("Sending cap to google")
             send_txt = r.recognize_google(audio,language = LANGUAGE, key = GOOGLE_SPEECH_KEY)
+            sys_process(send_txt)
             #send_txt = r.recognize_sphinx(audio)            
 
             print("got back from google")
