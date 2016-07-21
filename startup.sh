@@ -33,7 +33,7 @@ sudo yes | pip3 install SpeechRecognition &&
 git clone https://www.github.com/tai-korestate/kobo_stable.git /home/pi/kobo_stable &&
 
 
-git clone https://www.github.com/oaubert/python-vlc.git /home/pi/kobo_stable/python-vlc
+#git clone https://www.github.com/oaubert/python-vlc.git /home/pi/kobo_stable/python-vlc
 
 cd /home/pi/kobo_stable/python-vlc/ && sudo python3 setup.py install
 
