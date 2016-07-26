@@ -1,5 +1,6 @@
 #/usr/bin/python3
 
+
 from kgtts import gTTS
 from config import *
 import os
@@ -13,13 +14,15 @@ import random
 import processes
 import config
 
+import RPi.GPIO as GPIO
+
 print(dir(config))
 
 from vlc import Instance
-from threading import Thread
+from threading import Thread,Lock
 
 
-
+BLINK = True
 print("Determining Endpoints")
 DEVICE_ID = open('ids/device_id.txt','r').read()
 ACTIVE = True
@@ -30,9 +33,20 @@ kobo_voice = os.path.join(os.path.abspath(os.curdir), "kobo_voice.flac")
 DEBUG = False
 
 
-
 GOOGLE_SPEECH_KEY = "AIzaSyAQsZ8EA5lWYn09g09TPqVkQxIbU5QxH4I"
 
+
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(11,GPIO.OUT)
+
+def blink_light(timing = .5):
+    while True:
+        if BLINK == True:
+            GPIO.output(11,True)
+            time.sleep(timing)
+            GPIO.output(11,False)
+            time.sleep(timing)
 
 #######################################################################
 #######################################################################
@@ -47,21 +61,27 @@ pro = processes.Processor()
 t = pro.processtime()
 
 reminder_thread = Thread(name = "reminder", target = pro.task_thread)
+lite_thread = Thread(name = 'lite', target = blink_light)
 
-print("Spinning up Reminder Engine")
+#print("Spinning up Reminder Engine")
+
 reminder_thread.start()
+lite_thread.start()
+
 pro.vlc_playback("Hello, I am Kobo, your home assistant.  The date is %s.  Say something when you are ready to begin." % t[1])
 
 with sr.Microphone(sample_rate = 48000, device_index = 2, chunk_size = 5120) as source:
-#    r.adjust_for_ambient_noise(source, duration = 1)
-    while True:    
+
+    while True:
+        BLINK = False    
  #       PB = True
         print("Say Something...")
         
-               
+#        r.adjust_for_ambient_noise(source, duration = 0.5)
         audio = r.listen(source)
-        print("Done Listening") 
-        
+ #       print("Done Listening") 
+        #GPIO.output(11,True) 
+        BLINK = True
         ###BEEP###
         #subprocess.Popen(["vlc","--play-and-exit","beep.wav"])
         #subprocess.Popen(["omxplayer","-o","local","beep.wav"])
@@ -81,6 +101,7 @@ with sr.Microphone(sample_rate = 48000, device_index = 2, chunk_size = 5120) as 
             response = get(ENDPOINT.format(target = send_txt))
             print("Response received")
             pro.vlc_playback(response.text) 
+            GPIO.output(11,False)
 
 
         except sr.UnknownValueError:

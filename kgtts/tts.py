@@ -111,11 +111,13 @@ class gTTS:
             }
             if self.debug: print(payload)
             try:
-                r = requests.get(self.GOOGLE_TTS_URL, params=payload, headers=headers)
+                r = requests.head(self.GOOGLE_TTS_URL, params=payload, headers=headers)
                 if self.debug:
                     print("Headers: {}".format(r.request.headers))
                     print("Reponse: {}, Redirects: {}".format(r.status_code, r.history))
                     print(str(r.url))
+                    print(str(dir(r)))
+ 
                 self.latest_url = r.url
                 #r.raise_for_status()
              

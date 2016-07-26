@@ -6,7 +6,7 @@ import subprocess
 from vlc import Instance
 from kgtts import gTTS
 import requests
-
+import RPi.GPIO as GPIO
 
 DEVICE_ID = open('ids/device_id.txt','r').read()
 
@@ -17,6 +17,12 @@ stop_prompts = ("shut", "stop","quiet","don't listen")
 
 
 LANGUAGE = 'en-us'
+
+
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(11,GPIO.OUT)
+
 
 class Processor(object):
 
@@ -35,7 +41,20 @@ class Processor(object):
 
         self.ACTIVE = ACTIVE
         self.DEBUG = DEBUG
-        print('MY SCOPE:::',vars())
+#        print('MY SCOPE:::',vars())
+
+
+    def light_wrapper(func):
+        def run_func(self,data):
+            GPIO.output(11,True)
+            func(self,data)
+            GPIO.output(11,False)
+            GPIO.cleanup
+            return
+     
+        return run_func
+
+
 
 
     def raw_vlc_playback(self):
@@ -43,28 +62,28 @@ class Processor(object):
             return
 
         else:
-            print('PLAYING MEDIA')
+#            print('PLAYING MEDIA')
             media = self.instance.media_new(my_file_name)
             self.player.set_media(media)
             self.player.play()
             return
-
+#    @light_wrapper
     def vlc_playback(self, my_text):
         if self.ACTIVE == False:
             return
 
         else:
 
-            print("Sending to GTTS")
+#            print("Sending to GTTS")
             tts = gTTS(text = my_text, lang = LANGUAGE, debug = self.DEBUG)
         
-            print("Text Processed")
+#            print("Text Processed")
             tts.write_to_fp()
         
-            print("ReceivED INFO PLAYING INFO FROM %s" % tts.latest_url )
+#            print("ReceivED INFO PLAYING INFO FROM %s" % tts.latest_url )
             media = self.instance.media_new(tts.latest_url)
         
-            print("Opening the media")
+#            print("Opening the media")
             self.player.set_media(media)
         
             self.player.play()
@@ -94,11 +113,12 @@ class Processor(object):
 
     def task_thread(self,timing = 60):
         while True:
-            time.sleep(60)
+            time.sleep(.5)
             r = requests.get(REM_ENDPOINT)
+            print(r)
             if len(r.content) > 0:
-                vlc_playback(r.content)
+                self.vlc_playback(str(r.content))
             else:
-                return
+                pass
 
             
